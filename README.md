@@ -31,13 +31,23 @@ A native-feeling VS Code extension that makes JSON files easier to **understand,
 
 ## Install
 
-### From VSIX
+### From GitHub Releases (recommended)
+
+Download the latest `json-explorer-native-*.vsix` from
+[Releases](https://github.com/proamlan/vscode-json-explorer/releases), then:
 
 ```sh
-code --install-extension json-explorer-native-1.0.0.vsix
+code --install-extension json-explorer-native-*.vsix
 ```
 
 Or in VS Code: `Extensions (⇧⌘X) → … → Install from VSIX…`.
+
+### From a local build
+
+```sh
+npm run vsix
+code --install-extension json-explorer-native-*.vsix
+```
 
 ### Requirements
 
