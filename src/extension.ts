@@ -25,6 +25,9 @@ import { copyPath, copyPointer, goToPath } from './commands/path';
 import { FocusMode } from './commands/focus';
 import { JsonLensProvider } from './readability/JsonLensProvider';
 import { JsonClosingLabelProvider } from './readability/ClosingLabels';
+import { CountBadges } from './readability/CountBadges';
+import { runFindEmptyValues } from './commands/empty';
+import { runRenameKey } from './commands/rename';
 import {
   askLevelAndCollapse,
   collapseAll,
@@ -50,6 +53,7 @@ export function activate(context: vscode.ExtensionContext): void {
     showCodeLens: (): boolean => getConfig('jsonExplorer', 'showCodeLens', true),
     showClosingLabels: (): boolean => getConfig('jsonExplorer', 'showClosingLabels', true),
     closingLabelMinLines: (): number => getConfig('jsonExplorer', 'closingLabelMinLines', 8),
+    showInlineCounts: (): boolean => getConfig('jsonExplorer', 'showInlineCounts', true),
   };
 
   function parseDoc(doc: vscode.TextDocument): { root: JsonCNode | undefined; errors: ReturnType<typeof parseText>['errors'] } {
@@ -162,15 +166,22 @@ export function activate(context: vscode.ExtensionContext): void {
   );
   new JsonInspector(getRoot).register(context);
 
+  // --- Inline count badges (editor decorations) ---
+  const badges = new CountBadges(getRoot, cfg.showInlineCounts, cfg.maxDepth);
+  context.subscriptions.push(badges);
+  const refreshBadges = (): void => badges.update(vscode.window.visibleTextEditors);
+
   // --- Events ---
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((editor) => {
       refreshViews(editor?.document);
+      refreshBadges();
       if (editor && isJsonDocument(editor.document.languageId)) scheduleDiagnostics(editor.document);
     }),
     vscode.workspace.onDidChangeTextDocument((e) => {
       if (!isJsonDocument(e.document.languageId)) return;
       refreshViews(e.document);
+      refreshBadges();
       scheduleDiagnostics(e.document);
     }),
     vscode.workspace.onDidOpenTextDocument((doc) => {
@@ -188,6 +199,7 @@ export function activate(context: vscode.ExtensionContext): void {
         refreshViews();
         lensProvider.refresh();
         closingLabels.refresh();
+        refreshBadges();
         const ed = vscode.window.activeTextEditor;
         if (ed && isJsonDocument(ed.document.languageId)) scheduleDiagnostics(ed.document);
       }
@@ -282,6 +294,17 @@ export function activate(context: vscode.ExtensionContext): void {
         : undefined;
       await stats.showDetails(s?.doc, s?.root);
     }),
+    vscode.commands.registerCommand('jsonExplorer.findEmptyValues', async () => {
+      const s = activeRoot();
+      if (!s) return;
+      await runFindEmptyValues(s.doc, s.root);
+    }),
+    vscode.commands.registerCommand('jsonExplorer.renameKey', async () => {
+      const editor = vscode.window.activeTextEditor;
+      const s = activeRoot();
+      if (!editor || !s) return;
+      await runRenameKey(s.doc, s.root, editor.selection.active);
+    }),
     vscode.commands.registerCommand('jsonExplorer.foldBlock', async (startLine?: number) => {
       const editor = vscode.window.activeTextEditor;
       if (!editor || typeof startLine !== 'number') return;
@@ -309,6 +332,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // Initial refresh
   refreshViews();
+  refreshBadges();
   const initial = vscode.window.activeTextEditor;
   if (initial && isJsonDocument(initial.document.languageId)) scheduleDiagnostics(initial.document);
 }

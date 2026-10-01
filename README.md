@@ -10,6 +10,7 @@ A native-feeling VS Code extension that makes JSON files easier to **understand,
 
 - **JSON Explorer** sidebar tree with object/array counts (`{8}`, `[1,248]`), type icons, and lazy pagination for huge arrays — click any node to jump to it in the editor.
 - **Item counts everywhere**: tree descriptions (`8 properties`, `1,248 items`), hover inspector, and breadcrumb tooltips.
+- **Inline count badges**: dimmed `8 properties` / `1,248 items` at the end of each `{` / `[` line — counts you can't miss.
 - **CodeLens summaries**: `8 properties` / `1,248 items` above every multi-line block — click to fold it.
 - **Closing labels**: subtle inlay hints (`users`, `users[12]`) after long blocks so you always know which `}` you're looking at.
 - **Statistics** status bar (`size • nodes • depth`) with a detail view.
@@ -27,6 +28,8 @@ A native-feeling VS Code extension that makes JSON files easier to **understand,
 - **Schema validation** via local `$schema`, reported in the Problems panel.
 - **Generate Schema** from a document or selection.
 - **Diagnostics**: invalid JSON/JSONC, duplicate keys, schema violations — with safe quick fixes.
+- **Find Empty Values**: jump to any `null` / `""` / `[]` / `{}` by path, or prune them all with confirmation.
+- **Rename Key**: rename a property document-wide or within a scope (collision-safe, aborts on duplicates).
 - **Format / Minify** (document + selection, respects indent settings, JSONC-safe), **Sort keys** (document, recursive, selection — never arrays).
 
 ## Install
@@ -71,6 +74,7 @@ Open any `.json` / `.jsonc` file:
 | `jsonExplorer.showStatistics` | `true` | Status bar statistics |
 | `jsonExplorer.showBreadcrumbs` | `true` | Status bar path breadcrumb |
 | `jsonExplorer.showCodeLens` | `true` | Item-count CodeLens above blocks (click to fold) |
+| `jsonExplorer.showInlineCounts` | `true` | Inline count badges at the end of `{` / `[` lines |
 | `jsonExplorer.showClosingLabels` | `true` | Closing key labels after long blocks |
 | `jsonExplorer.closingLabelMinLines` | `8` | Min block height (lines) for a closing label |
 | `jsonExplorer.maxArrayItems` | `100` | Children per page in the explorer |

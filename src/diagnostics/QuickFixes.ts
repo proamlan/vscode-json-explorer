@@ -48,7 +48,7 @@ export class JsonQuickFixes implements vscode.CodeActionProvider {
   }
 }
 
-function expandWithComma(doc: vscode.TextDocument, r: vscode.Range): vscode.Range {
+export function expandWithComma(doc: vscode.TextDocument, r: vscode.Range): vscode.Range {
   const text = doc.getText();
   const start = doc.offsetAt(r.start);
   const end = doc.offsetAt(r.end);

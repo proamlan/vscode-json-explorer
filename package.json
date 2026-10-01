@@ -2,7 +2,7 @@
   "name": "json-explorer-native",
   "displayName": "JSON Explorer",
   "description": "Make JSON feel like an interactive data structure. Native tree explorer, path navigation, search, inspector, schema validation, diagnostics and editing tools.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "json-explorer",
   "license": "MIT",
   "repository": {
@@ -189,6 +189,16 @@
         "command": "jsonExplorer.foldBlock",
         "title": "JSON: Fold Block",
         "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.findEmptyValues",
+        "title": "JSON: Find Empty Values",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.renameKey",
+        "title": "JSON: Rename Key",
+        "category": "JSON"
       }
     ],
     "menus": {
@@ -321,6 +331,11 @@
           "default": 8,
           "minimum": 2,
           "description": "Minimum block height (lines) before a closing label is shown."
+        },
+        "jsonExplorer.showInlineCounts": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline item-count badges at the end of JSON object/array lines."
         }
       }
     }
