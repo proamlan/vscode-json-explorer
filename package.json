@@ -1,0 +1,340 @@
+{
+  "name": "json-explorer-native",
+  "displayName": "JSON Explorer",
+  "description": "Make JSON feel like an interactive data structure. Native tree explorer, path navigation, search, inspector, schema validation, diagnostics and editing tools.",
+  "version": "1.0.0",
+  "publisher": "json-explorer",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "json",
+    "jsonc",
+    "explorer",
+    "schema",
+    "navigation"
+  ],
+  "activationEvents": [
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "onView:jsonExplorerView"
+  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "compile": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "vitest run",
+    "package": "npm run build",
+    "vscode:prepublish": "npm run build",
+    "vsix": "vsce package --no-dependencies"
+  },
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "jsonExplorerView",
+          "name": "JSON Explorer"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "jsonExplorer.openExplorer",
+        "title": "JSON: Open Explorer",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.searchStructure",
+        "title": "JSON: Search Structure",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.copyPath",
+        "title": "JSON: Copy JSON Path",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.copyPointer",
+        "title": "JSON: Copy JSON Pointer",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.goToPath",
+        "title": "JSON: Go to JSON Path",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.inspectNode",
+        "title": "JSON: Inspect Node",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.format",
+        "title": "JSON: Format",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.formatSelection",
+        "title": "JSON: Format Selection",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.minify",
+        "title": "JSON: Minify",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.minifySelection",
+        "title": "JSON: Minify Selection",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.sortKeys",
+        "title": "JSON: Sort Keys",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.sortKeysRecursive",
+        "title": "JSON: Sort Keys Recursively",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.sortSelectedObject",
+        "title": "JSON: Sort Selected Object",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.generateSchema",
+        "title": "JSON: Generate Schema",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.validateSchema",
+        "title": "JSON: Validate Schema",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.focusNode",
+        "title": "JSON: Focus on Node",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.returnFromFocus",
+        "title": "JSON: Return to Document",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.collapseAll",
+        "title": "JSON: Collapse All",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.expandAll",
+        "title": "JSON: Expand All",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.collapseToLevel",
+        "title": "JSON: Collapse to Level",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.collapseArrays",
+        "title": "JSON: Collapse Arrays",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.collapseObjects",
+        "title": "JSON: Collapse Objects",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.showStatistics",
+        "title": "JSON: Show Statistics",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.removeDuplicate",
+        "title": "JSON: Remove duplicate property",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.fixJson",
+        "title": "JSON: Fix JSON",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.showMore",
+        "title": "JSON: Show More Items",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.revealNode",
+        "title": "JSON: Reveal Node",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.foldBlock",
+        "title": "JSON: Fold Block",
+        "category": "JSON"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "jsonExplorer.contextMenu",
+          "group": "navigation",
+          "when": "editorLangId == json || editorLangId == jsonc"
+        }
+      ],
+      "jsonExplorer.contextMenu": [
+        {
+          "command": "jsonExplorer.inspectNode",
+          "group": "1_inspect"
+        },
+        {
+          "command": "jsonExplorer.copyPath",
+          "group": "1_inspect"
+        },
+        {
+          "command": "jsonExplorer.copyPointer",
+          "group": "1_inspect"
+        },
+        {
+          "command": "jsonExplorer.formatSelection",
+          "group": "2_edit"
+        },
+        {
+          "command": "jsonExplorer.minifySelection",
+          "group": "2_edit"
+        },
+        {
+          "command": "jsonExplorer.sortSelectedObject",
+          "group": "2_edit"
+        },
+        {
+          "command": "jsonExplorer.generateSchema",
+          "group": "3_tools"
+        },
+        {
+          "command": "jsonExplorer.focusNode",
+          "group": "3_tools"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "jsonExplorer.returnFromFocus",
+          "when": "false"
+        },
+        {
+          "command": "jsonExplorer.removeDuplicate",
+          "when": "false"
+        },
+        {
+          "command": "jsonExplorer.fixJson",
+          "when": "false"
+        },
+        {
+          "command": "jsonExplorer.showMore",
+          "when": "false"
+        },
+        {
+          "command": "jsonExplorer.revealNode",
+          "when": "false"
+        },
+        {
+          "command": "jsonExplorer.foldBlock",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "jsonExplorer.searchStructure",
+          "group": "navigation",
+          "when": "view == jsonExplorerView"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "jsonExplorer.contextMenu",
+        "label": "JSON"
+      }
+    ],
+    "configuration": {
+      "title": "JSON Explorer",
+      "properties": {
+        "jsonExplorer.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable JSON Explorer features."
+        },
+        "jsonExplorer.showStatistics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show JSON statistics in the status bar."
+        },
+        "jsonExplorer.showBreadcrumbs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show JSON path breadcrumb in the status bar."
+        },
+        "jsonExplorer.maxArrayItems": {
+          "type": "number",
+          "default": 100,
+          "description": "Max children rendered per array/object page in the explorer."
+        },
+        "jsonExplorer.maxDepth": {
+          "type": "number",
+          "default": 20,
+          "description": "Max depth expanded in outline/tree operations."
+        },
+        "jsonExplorer.validateSchema": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate against $schema when present."
+        },
+        "jsonExplorer.showCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show item-count CodeLens above JSON objects/arrays (click to fold)."
+        },
+        "jsonExplorer.showClosingLabels": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show subtle closing labels (key names) after long JSON blocks."
+        },
+        "jsonExplorer.closingLabelMinLines": {
+          "type": "number",
+          "default": 8,
+          "minimum": 2,
+          "description": "Minimum block height (lines) before a closing label is shown."
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "jsonc-parser": "^3.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.12.0",
+    "@types/node": "^22.7.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.23.0",
+    "eslint": "^9.12.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.8.0",
+    "vitest": "^2.1.2"
+  }
+}
