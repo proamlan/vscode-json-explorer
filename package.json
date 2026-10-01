@@ -1,14 +1,24 @@
 {
   "name": "json-explorer-native",
   "displayName": "JSON Explorer",
-  "description": "Make JSON feel like an interactive data structure. Native tree explorer, path navigation, search, inspector, schema validation, diagnostics and editing tools.",
-  "version": "1.1.0",
+  "description": "Understand JSON at a glance: native tree explorer, inline item counts, path navigation, schema validation, and safe editing — right inside VS Code.",
+  "version": "1.1.1",
   "publisher": "json-explorer",
   "license": "MIT",
+  "author": "proamlan",
+  "homepage": "https://github.com/proamlan/vscode-json-explorer",
+  "bugs": {
+    "url": "https://github.com/proamlan/vscode-json-explorer/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/proamlan/vscode-json-explorer.git"
   },
+  "galleryBanner": {
+    "color": "#1E1E1E",
+    "theme": "dark"
+  },
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -20,8 +30,14 @@
     "json",
     "jsonc",
     "explorer",
+    "outline",
     "schema",
-    "navigation"
+    "validation",
+    "navigation",
+    "jsonpath",
+    "json-pointer",
+    "format",
+    "folding"
   ],
   "activationEvents": [
     "onLanguage:json",

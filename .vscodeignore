@@ -1,6 +1,9 @@
 .vscode/**
 .vscode-test/**
 src/**
+.github/**
+images/render_icon.py
+settings.json
 .gitignore
 eslint.config.mjs
 esbuild.config.mjs

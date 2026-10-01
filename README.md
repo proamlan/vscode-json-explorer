@@ -1,5 +1,7 @@
 # JSON Explorer
 
+[![Release](https://github.com/proamlan/vscode-json-explorer/actions/workflows/release.yml/badge.svg)](https://github.com/proamlan/vscode-json-explorer/releases)
+
 A native-feeling VS Code extension that makes JSON files easier to **understand, navigate, inspect, validate, and edit**.
 
 > VS Code finally understands JSON properly — not a separate JSON app inside VS Code.
