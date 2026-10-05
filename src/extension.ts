@@ -9,9 +9,15 @@ import { BreadcrumbProvider } from './navigation/BreadcrumbProvider';
 import { PositionResolver } from './navigation/PositionResolver';
 import {
   duplicatesToDiagnostics,
+  duplicateValuesToDiagnostics,
+  emptyValuesToDiagnostics,
+  missingKeysToDiagnostics,
   parseErrorsToDiagnostics,
   schemaIssuesToDiagnostics,
 } from './diagnostics/JsonDiagnostics';
+import { HealthBar } from './diagnostics/HealthBar';
+import { IssueDecorations } from './readability/IssueDecorations';
+import { goToIssue } from './commands/issues';
 import { resolveSchema, validateAgainstSchema } from './diagnostics/SchemaValidator';
 import { JsonQuickFixes, deterministicRepairs } from './diagnostics/QuickFixes';
 import { JsonInspector } from './inspector/JsonInspector';
@@ -27,6 +33,8 @@ import { JsonLensProvider } from './readability/JsonLensProvider';
 import { JsonClosingLabelProvider } from './readability/ClosingLabels';
 import { CountBadges } from './readability/CountBadges';
 import { runFindEmptyValues } from './commands/empty';
+import { runFindDuplicates, runSanityCheckCommand } from './commands/duplicates';
+import { EmptyHighlights } from './readability/EmptyHighlights';
 import { runRenameKey } from './commands/rename';
 import {
   askLevelAndCollapse,
@@ -54,6 +62,12 @@ export function activate(context: vscode.ExtensionContext): void {
     showClosingLabels: (): boolean => getConfig('jsonExplorer', 'showClosingLabels', true),
     closingLabelMinLines: (): number => getConfig('jsonExplorer', 'closingLabelMinLines', 8),
     showInlineCounts: (): boolean => getConfig('jsonExplorer', 'showInlineCounts', true),
+    highlightEmpty: (): boolean => getConfig('jsonExplorer', 'highlightEmptyValues', true),
+    showEmptyDiags: (): boolean => getConfig('jsonExplorer', 'showEmptyDiagnostics', false),
+    showDupValueDiags: (): boolean => getConfig('jsonExplorer', 'showDuplicateValueDiagnostics', true),
+    showMissingKeyDiags: (): boolean => getConfig('jsonExplorer', 'showMissingKeyDiagnostics', true),
+    showHealth: (): boolean => getConfig('jsonExplorer', 'showHealthIndicator', true),
+    highlightIssues: (): boolean => getConfig('jsonExplorer', 'highlightIssues', true),
   };
 
   function parseDoc(doc: vscode.TextDocument): { root: JsonCNode | undefined; errors: ReturnType<typeof parseText>['errors'] } {
@@ -84,11 +98,23 @@ export function activate(context: vscode.ExtensionContext): void {
   const positionResolver = new PositionResolver(getRoot);
   void positionResolver;
 
-  // --- Status bars: breadcrumb + statistics ---
+  // --- Status bars: breadcrumb + statistics + health ---
   const crumbs = new BreadcrumbProvider(() => undefined as never, cfg.showCrumbs);
   context.subscriptions.push(crumbs);
   const stats = new StatisticsBar(cfg.showStats);
   context.subscriptions.push(stats);
+  const health = new HealthBar(cfg.showHealth);
+  context.subscriptions.push(health);
+  const issueDecor = new IssueDecorations(cfg.highlightIssues);
+  context.subscriptions.push(issueDecor);
+
+  function refreshIssueVisibility(doc: vscode.TextDocument, all: vscode.Diagnostic[]): void {
+    health.update(doc, all);
+    treeProvider.setDiagnostics(doc, all);
+    for (const editor of vscode.window.visibleTextEditors) {
+      if (editor.document === doc) issueDecor.update(editor, all);
+    }
+  }
 
   const focusMode = new FocusMode();
 
@@ -99,6 +125,7 @@ export function activate(context: vscode.ExtensionContext): void {
       treeProvider.setDocument(undefined, undefined);
       crumbs.update(undefined, undefined, 0);
       stats.update(undefined, undefined);
+      health.update(undefined, undefined);
       return;
     }
     const { root } = parseDoc(active);
@@ -106,6 +133,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const offset = editor && editor.document === active ? active.offsetAt(editor.selection.active) : 0;
     crumbs.update(active, root, offset);
     stats.update(active, root);
+    health.update(active, diagnostics.get(active.uri));
   }
 
   // --- Diagnostics pipeline (debounced, cancellable) ---
@@ -120,6 +148,17 @@ export function activate(context: vscode.ExtensionContext): void {
       ...parseErrorsToDiagnostics(doc, errors),
       ...duplicatesToDiagnostics(doc, root),
     ];
+    if (errors.length === 0) {
+      if (cfg.showMissingKeyDiags()) {
+        all.push(...missingKeysToDiagnostics(doc, root));
+      }
+      if (cfg.showDupValueDiags()) {
+        all.push(...duplicateValuesToDiagnostics(doc, root));
+      }
+    }
+    if (cfg.showEmptyDiags()) {
+      all.push(...emptyValuesToDiagnostics(doc, root));
+    }
     if (cfg.validateSchema() && errors.length === 0 && root) {
       try {
         const resolved = await resolveSchema(doc, root);
@@ -133,6 +172,7 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     }
     diagnostics.set(doc.uri, all);
+    refreshIssueVisibility(doc, all);
   }
 
   function scheduleDiagnostics(doc: vscode.TextDocument): void {
@@ -169,7 +209,17 @@ export function activate(context: vscode.ExtensionContext): void {
   // --- Inline count badges (editor decorations) ---
   const badges = new CountBadges(getRoot, cfg.showInlineCounts, cfg.maxDepth);
   context.subscriptions.push(badges);
-  const refreshBadges = (): void => badges.update(vscode.window.visibleTextEditors);
+  const emptyHighlights = new EmptyHighlights(getRoot, cfg.highlightEmpty);
+  context.subscriptions.push(emptyHighlights);
+  const refreshBadges = (): void => {
+    badges.update(vscode.window.visibleTextEditors);
+    emptyHighlights.update(vscode.window.visibleTextEditors);
+    for (const editor of vscode.window.visibleTextEditors) {
+      if (isJsonDocument(editor.document.languageId)) {
+        issueDecor.update(editor, diagnostics.get(editor.document.uri) ?? []);
+      }
+    }
+  };
 
   // --- Events ---
   context.subscriptions.push(
@@ -298,6 +348,28 @@ export function activate(context: vscode.ExtensionContext): void {
       const s = activeRoot();
       if (!s) return;
       await runFindEmptyValues(s.doc, s.root);
+    }),
+    vscode.commands.registerCommand('jsonExplorer.findDuplicates', async () => {
+      const s = activeRoot();
+      if (!s) return;
+      await runFindDuplicates(s.doc, s.root);
+    }),
+    vscode.commands.registerCommand('jsonExplorer.checkSanity', async () => {
+      const editor = vscode.window.activeTextEditor;
+      const s = activeRoot();
+      if (!editor || !s) return;
+      const { errors } = parseDoc(s.doc);
+      await runSanityCheckCommand(s.doc, s.root, errors);
+    }),
+    vscode.commands.registerCommand('jsonExplorer.nextIssue', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor || !isJsonDocument(editor.document.languageId)) return;
+      await goToIssue(editor, diagnostics.get(editor.document.uri) ?? [], 1);
+    }),
+    vscode.commands.registerCommand('jsonExplorer.prevIssue', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor || !isJsonDocument(editor.document.languageId)) return;
+      await goToIssue(editor, diagnostics.get(editor.document.uri) ?? [], -1);
     }),
     vscode.commands.registerCommand('jsonExplorer.renameKey', async () => {
       const editor = vscode.window.activeTextEditor;

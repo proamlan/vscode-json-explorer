@@ -12,3 +12,5 @@ tsconfig.json
 **/*.map
 **/*.test.ts
 node_modules/**
+*.vsix
+scicode_tasks_20_delivery copy.json

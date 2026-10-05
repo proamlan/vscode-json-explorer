@@ -29,8 +29,13 @@ A native-feeling VS Code extension that makes JSON files easier to **understand,
 
 - **Schema validation** via local `$schema`, reported in the Problems panel.
 - **Generate Schema** from a document or selection.
-- **Diagnostics**: invalid JSON/JSONC, duplicate keys, schema violations — with safe quick fixes.
+- **Diagnostics**: invalid JSON/JSONC, duplicate keys, duplicate array values, missing keys across sibling objects (with typo hints), schema violations — with safe quick fixes.
+- **Error visibility**: whole-line error/warning bands with a colored left border and `●` marker, plus full-lane overview-ruler/minimap ticks so issues stand out in large files.
+- **JSON Explorer badges**: the sidebar tree shows `❌ N errors` / `⚠ N warnings` per node (bubbled up through parents), and a clickable error row when the file can't be parsed — so you never stare at a blank tree.
+- **Health indicator** status bar (`JSON: OK` / `JSON: 2 errors, 1 warning`, click to jump), **Check Sanity** report, and **Go to Next/Previous Issue** navigation.
+- **Empty-value highlights**: subtle inline badges for `null` / `""` / `[]` / `{}` (optionally also in Problems).
 - **Find Empty Values**: jump to any `null` / `""` / `[]` / `{}` by path, or prune them all with confirmation.
+- **Find Duplicates / Check Sanity**: quick issue lists with jump-to-line.
 - **Rename Key**: rename a property document-wide or within a scope (collision-safe, aborts on duplicates).
 - **Format / Minify** (document + selection, respects indent settings, JSONC-safe), **Sort keys** (document, recursive, selection — never arrays).
 
@@ -64,6 +69,7 @@ code --install-extension json-explorer-native-*.vsix
 Open any `.json` / `.jsonc` file:
 
 - The **JSON Explorer** view appears in the Explorer sidebar.
+- Error and warning counts appear inline in the tree (`❌`/`⚠`); when the file can't be parsed the tree shows a clickable error row instead of going blank.
 - The status bar shows the **breadcrumb path** (left) and **document statistics** (right).
 - Press `⌘⇧P` and type `JSON:` for all commands (search, paths, format, sort, schema, folding, focus…).
 - Right-click in a JSON file for the compact **JSON** submenu.
@@ -82,6 +88,12 @@ Open any `.json` / `.jsonc` file:
 | `jsonExplorer.maxArrayItems` | `100` | Children per page in the explorer |
 | `jsonExplorer.maxDepth` | `20` | Max depth for outline/analysis |
 | `jsonExplorer.validateSchema` | `true` | `$schema` validation |
+| `jsonExplorer.highlightEmptyValues` | `true` | Inline badges for empty/null values |
+| `jsonExplorer.showEmptyDiagnostics` | `false` | Also list empty/null values in Problems |
+| `jsonExplorer.showDuplicateValueDiagnostics` | `true` | Flag duplicate array entries in Problems |
+| `jsonExplorer.showMissingKeyDiagnostics` | `true` | Flag keys missing from some siblings |
+| `jsonExplorer.showHealthIndicator` | `true` | JSON health status-bar item |
+| `jsonExplorer.highlightIssues` | `true` | Whole-line bands + overview-ruler markers for errors/warnings |
 
 ## Development
 

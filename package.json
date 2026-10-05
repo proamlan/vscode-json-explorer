@@ -2,7 +2,7 @@
   "name": "json-explorer-native",
   "displayName": "JSON Explorer",
   "description": "Understand JSON at a glance: native tree explorer, inline item counts, path navigation, schema validation, and safe editing — right inside VS Code.",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "publisher": "json-explorer",
   "license": "MIT",
   "author": "proamlan",
@@ -212,6 +212,26 @@
         "category": "JSON"
       },
       {
+        "command": "jsonExplorer.findDuplicates",
+        "title": "JSON: Find Duplicates",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.checkSanity",
+        "title": "JSON: Check Sanity",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.nextIssue",
+        "title": "JSON: Go to Next Issue",
+        "category": "JSON"
+      },
+      {
+        "command": "jsonExplorer.prevIssue",
+        "title": "JSON: Go to Previous Issue",
+        "category": "JSON"
+      },
+      {
         "command": "jsonExplorer.renameKey",
         "title": "JSON: Rename Key",
         "category": "JSON"
@@ -352,6 +372,36 @@
           "type": "boolean",
           "default": true,
           "description": "Show inline item-count badges at the end of JSON object/array lines."
+        },
+        "jsonExplorer.highlightEmptyValues": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show subtle inline badges for empty/null values (null, \"\", [], {})."
+        },
+        "jsonExplorer.showEmptyDiagnostics": {
+          "type": "boolean",
+          "default": false,
+          "description": "Also list empty/null values in the Problems panel (informational)."
+        },
+        "jsonExplorer.showDuplicateValueDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Flag duplicate array entries in the Problems panel (warnings)."
+        },
+        "jsonExplorer.showMissingKeyDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Flag keys missing from some objects but present in most siblings (warnings with typo hints)."
+        },
+        "jsonExplorer.showHealthIndicator": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a JSON health status-bar item (error/warning counts, click to jump to issues)."
+        },
+        "jsonExplorer.highlightIssues": {
+          "type": "boolean",
+          "default": true,
+          "description": "Highlight whole error/warning lines + overview-ruler markers so issues stand out in large files."
         }
       }
     }

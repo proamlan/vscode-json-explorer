@@ -4,6 +4,7 @@ import { findNodeAtOffset, getNodeValue } from '../parser/JsonParser';
 import { depthOf, nodeTypeOf } from '../parser/JsonNode';
 import { formatBytes } from '../utils/debounce';
 import { getNodePathSegments, pathToJsonPathString } from '../parser/JsonPosition';
+import { emptyKindOf } from '../commands/empty';
 
 export class JsonInspector {
   constructor(private getRoot: (doc: vscode.TextDocument) => JsonCNode | undefined) {}
@@ -42,13 +43,21 @@ export class JsonInspector {
     const path = pathToJsonPathString(getNodePathSegments(target));
     const depth = depthOf(target);
     const lines: string[] = [];
-    lines.push(`**${t.toUpperCase()}**  \`${path}\``);
+    const empty = emptyKindOf(target);
+    const emptyTag = empty ? ` · ⚠ ${empty}` : '';
+    lines.push(`**${t.toUpperCase()}**  \`${path}\`${emptyTag}`);
     if (target.type === 'object') {
       const n = target.children?.length ?? 0;
-      lines.push(`Properties: ${n} · Depth: ${depth} · Size: ${formatBytes(target.length)}`);
+      lines.push(
+        n === 0
+          ? `Empty object · Depth: ${depth} · Size: ${formatBytes(target.length)}`
+          : `Properties: ${n} · Depth: ${depth} · Size: ${formatBytes(target.length)}`,
+      );
     } else if (target.type === 'array') {
       const n = target.children?.length ?? 0;
-      lines.push(`Items: ${n} · Depth: ${depth}`);
+      lines.push(
+        n === 0 ? `Empty array · Depth: ${depth}` : `Items: ${n} · Depth: ${depth}`,
+      );
     } else {
       const v = getNodeValue(target);
       if (typeof v === 'string') lines.push(`Length: ${v.length} · Depth: ${depth}`);

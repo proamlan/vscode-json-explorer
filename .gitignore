@@ -33,3 +33,4 @@ Thumbs.db
 # Personal editor config accidentally dropped in project root
 # (belongs in .vscode/settings.json if you want it applied)
 /settings.json
+/scicode_tasks_20_delivery copy.json
