@@ -95,6 +95,12 @@ Open any `.json` / `.jsonc` file:
 | `jsonExplorer.showHealthIndicator` | `true` | JSON health status-bar item |
 | `jsonExplorer.highlightIssues` | `true` | Whole-line bands + overview-ruler markers for errors/warnings |
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the full release history.
+Latest: **v1.2.0** — error visibility in the editor and explorer tree,
+health indicator, sanity checks, and new diagnostics.
+
 ## Development
 
 ```sh
